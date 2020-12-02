@@ -1,0 +1,10 @@
+exclude .dockerignore
+exclude .editorconfig
+exclude .flake8
+exclude .gitlab-ci.yml
+exclude Dockerfile
+exclude jupyterhub_config.py
+
+recursive-exclude examples *
+recursive-exclude .vscode *
+recursive-exclude conda.recipe *

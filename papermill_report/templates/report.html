@@ -1,0 +1,150 @@
+{% extends "page.html" %}
+
+{% block title %}Papermill Report Generator{% endblock %}
+
+{% block login_widget %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Fake require to avoid error with JupyterHub template
+  const require = {
+    config: () => { }
+  }
+</script>
+<script src="{{ static_url('components/jquery/dist/jquery.min.js') }}" type="text/javascript" charset="utf-8"></script>
+<script src="{{ static_url('components/bootstrap/dist/js/bootstrap.min.js') }}" type="text/javascript"
+  charset="utf-8"></script>
+<script src="{{ static_url('js/jsoneditor.min.js') }}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+  <div class="row text-center">
+    <h1>Report Generator</h1>
+  </div>
+
+  <div class="row col-sm-offset-2 col-sm-8">
+    {% if error_message -%}
+    <p class="spawn-error-msg text-danger">
+      Error: {{error_message}}
+    </p>
+    {% endif %}
+
+    <!-- <form enctype="multipart/form-data" id="spawn_form" action="{{url}}" method="post" role="form"> -->
+    <form enctype="multipart/form-data" id="spawn_form" method="post" role="form">
+      <select id="report-selector" class="form-control" onchange="selectReport()" name="path">
+        {% for report in reports %}
+        <option>{{report.path}}</option>
+        {% endfor %}
+      </select>
+      <div id="autoform-holder"></div>
+      <br>
+      <div class="feedback-container">
+        <input type="submit" value="Generate" class="btn btn-jupyter form-control" autofocus>
+        <div class="feedback-widget hidden">
+          <i class="fa fa-spinner"></i>
+        </div>
+      </div>
+    </form>
+    <br>
+    <p>
+      <small>
+        <ul>
+          Notes:
+          <li>String parameter should be surrounding with quotes.</li>
+          <li>Parameters cannot be a function of other parameters.</li>
+        </ul>
+      </small>
+    </p>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+{{ super() }}
+
+<script>
+  const reports = {{ reports }};
+  let editor = null;
+
+  function python2JSType(type) {
+    switch (type) {
+      case "bool":
+        return "boolean";
+      case "int":
+        return "integer";
+      case "float":
+        return "number";
+      case "NoneType":
+        return "null";
+      case "str":
+      default:
+        return "string";
+    }
+  }
+
+  function papermill2JSONSchema(name, parameters) {
+    schema = {
+      type: "object",
+      title: "Parameters",
+      properties: {}
+    };
+
+    for (const parameter of parameters) {
+      schema.properties[parameter.name] = {
+        type: python2JSType(parameter.inferred_type_name),
+        default: parameter.default
+      }
+    }
+
+    return schema;
+  }
+
+  function selectReport() {
+    const form = $('form');
+    form.find('.feedback-container>input').attr('disabled', false);
+    form.find('.feedback-container>input').removeClass('hidden');
+    form.find('.feedback-container>.feedback-widget').addClass('hidden');
+    form.find('.feedback-widget>i').removeClass('fa-pulse');
+
+    if (editor) {
+      editor.destroy();
+    }
+
+    const path = $('select#report-selector').val();
+    const selectedReport = reports.find((report) => report.path === path);
+
+    if (Object.keys(selectedReport.parameters).length > 0) {
+      const schema = papermill2JSONSchema(selectedReport.path, selectedReport.parameters);
+
+      editor = new JSONEditor(document.getElementById('autoform-holder'), {
+        disable_collapse: true,
+        disable_edit_json: false,
+        disable_properties: true,
+        no_additional_properties: true,
+        schema: schema,
+        theme: "bootstrap3"
+      });
+    }
+
+    $('form input[type=submit]').trigger('focus');
+  }
+
+  // setup onSubmit feedback
+  $('form').submit((e) => {
+    var form = $(e.target);
+    form.find('.feedback-container>input').attr('disabled', true);
+    form.find('.feedback-container>*').toggleClass('hidden');
+    form.find('.feedback-widget>*').toggleClass('fa-pulse');
+  });
+
+  // Initialize the form parameters
+  $().ready(() => {
+    selectReport();
+  });
+</script>
+{% endblock %}

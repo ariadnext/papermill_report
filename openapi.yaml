@@ -1,0 +1,147 @@
+openapi: "3.0.0"
+info:
+  title: Papermill Jupyter Report
+  version: "1.1.0"
+paths:
+  /:
+    get:
+      summary: Display a form to generate a report
+      responses:
+        "200":
+          description: Form to generate a report
+          content:
+            application/html:
+              schema:
+                type: string
+    post:
+      description: Callback for the template generation form
+      responses:
+        "201":
+          description: The generated report
+          content:
+            application/html:
+              schema:
+                type: string
+        "500":
+          description: Error at report generation
+          content:
+            application/html:
+              schema:
+                type: string
+  /{templatePath}:
+    get:
+      summary: Generate the report
+      parameters:
+        - name: templatePath
+          in: path
+          required: true
+          description: Notebook path (should end with .ipynb)
+          schema:
+            type: string
+          example: subfolder/simple_execute.ipynb
+        - name: variable
+          in: query
+          description: name=value to be passed to the report template
+          schema:
+            type: string
+          example: msg=hello&a=11
+      responses:
+        "200":
+          description: The generated report
+          content:
+            application/html:
+              schema:
+                type: string
+        "404":
+          description: Template not found
+          content:
+            application/html:
+              schema:
+                type: string
+        "500":
+          description: Unexpected error
+          content:
+            application/html:
+              schema:
+                type: string
+  /api/templates/:
+    get:
+      summary: List all report templates
+      responses:
+        "200":
+          description: The list of available report templates
+          content:
+              application/json:
+                schema:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    templates:
+                      type: array
+                      items:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          path:
+                            type: string
+                          parameters:
+                            type: array
+                            items:
+                              type: object
+                              additionalProperties: false
+                              properties:
+                                name:
+                                  type: string
+                                  description: Parameter name
+                                inferred_type_name:
+                                  type: string
+                                  description: Parameter inferred type
+                                default:
+                                  type: string
+                                  description: Default parameter value
+                                help:
+                                  type: string
+                                  description: Parameter help
+                  example:
+                    {
+                     "templates": [
+                        {
+                          "path": "broken_parameters.ipynb",
+                          "parameters": [
+                            {
+                              "name": "msg",
+                              "inferred_type_name": "None",
+                              "default": "None",
+                              "help": ""
+                            },
+                            {
+                              "name": "a",
+                              "inferred_type_name": "float",
+                              "default": "2.25",
+                              "help": "Variable a"
+                            },
+                            {
+                              "name": "b",
+                              "inferred_type_name": "List[str]",
+                              "default": "['Hello','World']",
+                              "help": "Nice list"
+                            }
+                          ]
+                        },
+                        {
+                          "path": "no_parameters.ipynb",
+                          "parameters": []
+                        },
+                        {
+                          "path": "subfolder/simple_execute.ipynb",
+                          "parameters": [
+                            {
+                              "name": "msg",
+                              "inferred_type_name": "None",
+                              "default": "None",
+                              "help": ""
+                            }
+                          ]
+                        }
+                      ]
+                    }

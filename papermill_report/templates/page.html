@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="utf-8">
+
+  <title>{% block title %}Papermill Jupyter Report{% endblock %}</title>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/hub/static/css/style.min.css" type="text/css">
+
+  {% block scripts %}
+  {% endblock %}
+</head>
+
+<body>
+
+  {% block nav_bar %}
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <span id="jupyterhub-logo" class="pull-left">
+          <a href="/"><img style="height:28px;margin-top:6px;" src="/logo" /></a>
+        </span>
+      </div>
+    </div>
+  </nav>
+  {% endblock %}
+
+
+  {% block main %}
+  {% endblock %}
+
+  {% block footer %}
+  {% endblock %}
+
+  {% block script %}
+  {% endblock %}
+
+</body>
+
+</html>
