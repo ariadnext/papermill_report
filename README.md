@@ -83,7 +83,7 @@ docker build -t papermill-report .
 docker run -p 8000:8000 --rm papermill-report
 ```
 
-The Hub is parameterized with two users:
+The Hub is parameterized (see [jupyterhub_config.py](./jupyterhub_config.py)) with two users:
 
 - jovyan: an administrator
 - marc: an user
