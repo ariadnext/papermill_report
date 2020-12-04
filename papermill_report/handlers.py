@@ -22,13 +22,15 @@ from tornado.log import app_log
 
 from .utils import _execute_command, update_git_repository
 
+ANONYMOUS_USER = "anonymous_pm_report"
+
 if os.environ.get("JUPYTERHUB_API_TOKEN"):
     from jupyterhub.services.auth import HubOAuthenticated
 else:
     # Deactivate authentication
     class HubOAuthenticated:
         def get_current_user(self):
-            return {"name": "anonymous"}
+            return {"name": ANONYMOUS_USER}
 
 
 def _serialize_exception(error: BaseException, message: str = "") -> dict:
@@ -211,7 +213,9 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
         Raises:
             CalledProcessError: If the git repository cannot be updated.
         """
-        await update_git_repository(self.report_root_path, self.report_path, self.report_git_url)
+        await update_git_repository(
+            self.report_root_path, self.report_path, self.report_git_url
+        )
         template_dir = Path(self.report_root_path) / self.report_path
 
         templates = []
@@ -319,15 +323,17 @@ class TemplateHandler(ReportHandler):
         Returns:
             The copied broken report path
         """
-        local_user = pwd.getpwnam(username)
+        local_user = pwd.getpwnam(username) if username != ANONYMOUS_USER else None
         prefix = datetime.strftime(datetime.now(), "%Y-%m-%d") + "_broken_"
         broken_notebook = Path(self.broken_path) / (prefix + notebook_path.name)
         if not broken_notebook.parent.exists():
             broken_notebook.parent.mkdir(parents=True)
-            os.chown(broken_notebook.parent, local_user.pw_uid, local_user.pw_gid)
+            if local_user:
+                os.chown(broken_notebook.parent, local_user.pw_uid, local_user.pw_gid)
 
         broken_notebook.write_text(Path(notebook_path).read_text())
-        os.chown(broken_notebook, local_user.pw_uid, local_user.pw_gid)
+        if local_user:
+            os.chown(broken_notebook, local_user.pw_uid, local_user.pw_gid)
 
         return broken_notebook
 
@@ -359,9 +365,7 @@ class TemplateHandler(ReportHandler):
         if isinstance(error, CalledProcessError):
             message += "<br><br><code>" + error.stderr.replace("\n", "<br>") + "</code>"
 
-        self.log.error(
-            message, exc_info=error,
-        )
+        self.log.error(message, exc_info=error)
         self.write_error(500, message, exc_info=sys.exc_info())
 
     @web.authenticated
@@ -381,7 +385,9 @@ class TemplateHandler(ReportHandler):
         """
         username = self.get_current_user()["name"]
         try:
-            await update_git_repository(self.report_root_path, self.report_path, self.report_git_url)
+            await update_git_repository(
+                self.report_root_path, self.report_path, self.report_git_url
+            )
         except CalledProcessError as error:
             self.log.error(
                 f"Fail to update the Jupyter reports repository '{self.report_git_url}'.",
@@ -433,10 +439,10 @@ class TemplateHandler(ReportHandler):
                 str(output_nb),
             ]
             try:
-                if username != "anonymous":
+                if username != ANONYMOUS_USER:
                     # Generate the report impersonating the authenticated user
                     await _execute_command(
-                        ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder,
+                        ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder
                     )
                 else:
                     await _execute_command(command, cwd=tmp_folder)
@@ -460,9 +466,9 @@ class TemplateHandler(ReportHandler):
                     str(output_nb),
                 ]
 
-                if username != "anonymous":
+                if username != ANONYMOUS_USER:
                     await _execute_command(
-                        ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder,
+                        ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder
                     )
                 else:
                     await _execute_command(command, cwd=tmp_folder)

@@ -1,6 +1,7 @@
 """Webservice API."""
 import logging
 import os
+import socket
 import typing as tp
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -8,7 +9,7 @@ from urllib.parse import urlsplit, urlunsplit
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
 from tornado import ioloop, web
 from tornado.log import access_log, app_log, gen_log
-from traitlets import Dict, Int, List, Unicode, default
+from traitlets import Dict, Int, List, Unicode, default, validate
 from traitlets.config.application import Application
 
 from .handlers import TemplateHandler, TemplatesAPIHandler, TemplatesHandler
@@ -80,11 +81,41 @@ class PapermillReport(Application):
         config=True,
     )
 
-    api_prefix = Unicode(help="Papermill API prefix")
+    api_prefix = Unicode(help="Papermill API prefix", config=True)
 
     @default("api_prefix")
     def _default_api_prefix(self):
         return os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+
+    ip = Unicode(
+        "localhost",
+        config=True,
+        help="The IP address the notebook server will listen on.",
+    )
+
+    @default("ip")
+    def _default_ip(self):
+        """Return localhost if available, 127.0.0.1 otherwise.
+        On some (horribly broken) systems, localhost cannot be bound.
+        """
+        s = socket.socket()
+        try:
+            s.bind(("localhost", 0))
+        except socket.error as e:
+            self.log.warning(
+                "Cannot bind to localhost, using 127.0.0.1 as default ip\n%s", e
+            )
+            return "127.0.0.1"
+        else:
+            s.close()
+            return "localhost"
+
+    @validate("ip")
+    def _validate_ip(self, proposal):
+        value = proposal["value"]
+        if value == "*":
+            value = ""
+        return value
 
     @default("log_format")
     def _log_format_default(self):
@@ -172,17 +203,19 @@ class PapermillReport(Application):
             static_path=static_path,
             static_url_prefix=static_url_prefix,
             jinja2_env=Environment(
-                loader=ChoiceLoader(loaders), trim_blocks=True, lstrip_blocks=True,
+                loader=ChoiceLoader(loaders),
+                trim_blocks=True,
+                lstrip_blocks=True,
             ),
             cookie_secret=os.urandom(32),
         )
-        application.listen(self.port)
+        application.listen(self.port, self.ip)
         return application
 
     def start(self):
         """Start the server."""
         _ = self.make_app()
-        self.log.info(f"Papermill service listening on port {self.port}")
+        self.log.info(f"Papermill service listening on {self.ip}:{self.port}")
         self.log.info("Press Ctrl+C to stop")
         # Schedule repository update (or creation) at startup
         ioloop.IOLoop.current().spawn_callback(
