@@ -8,3 +8,4 @@ exclude jupyterhub_config.py
 recursive-exclude examples *
 recursive-exclude .vscode *
 recursive-exclude conda.recipe *
+recursive-include papermill_report/static *

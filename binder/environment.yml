@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.6,<3.9
+  # To provide the templates
+  - jinja2
+  - jupyterhub-base
+  - jupyterlab =2
+  - jupyter-server-proxy
+  - nbconvert
+  - papermill >=2.2.0
+  - tornado >=6
+  - traitlets >=4
+  - nodejs >=11
