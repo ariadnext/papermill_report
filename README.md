@@ -1,5 +1,6 @@
 # Papermill Jupyter report
 
+[![PyPI](https://img.shields.io/pypi/v/papermill-report)](https://pypi.org/project/papermill-report/)
 [![Install with conda](https://anaconda.org/conda-forge/papermill_report/badges/installer/conda.svg)](https://anaconda.org/conda-forge/papermill_report)
 [![Github Actions Status](https://github.com/ariadnext/papermill_report/workflows/Test/badge.svg)](https://github.com/ariadnext/papermill_report/actions?query=workflow%3ATest)
 
