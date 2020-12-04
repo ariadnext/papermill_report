@@ -7,6 +7,8 @@ Microservice to generate Jupyter reports by executing notebook and exporting the
 
 It can be run as a standalone application or as a JupyterHub service.
 
+![![Demo](https://github.com/ariadnext/papermill_report/raw/master/docs/demo.gif)](./docs/demo.gif)
+
 The workflow is described in the figure below. You can either:
 1. Set a specific URL to select a notebook and pass query arguments as parameters,
 2. Or interactively select one notebook and set its parameters.

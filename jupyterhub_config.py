@@ -25,6 +25,10 @@ c.JupyterHub.services = [
             "-m",
             "papermill_report",
             "--debug",
+            "--PapermillReport.ip",
+            "127.0.0.1",
+            "--PapermillReport.port",
+            "8888",
             "--PapermillReport.template_root_dir",
             "/opt/ariadnext/reports/",
             # Comment the two following options if you want to test the non-git case
