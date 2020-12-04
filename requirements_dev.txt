@@ -10,6 +10,8 @@ flake8-comprehensions
 isort
 jupyterhub>=1
 rope
+playwright
 pytest
+pytest-playwright
 pytest-tornasync
 ipykernel

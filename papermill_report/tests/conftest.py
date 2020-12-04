@@ -1,11 +1,61 @@
 import json
+import re
+from pathlib import Path
 from subprocess import check_call
 
 import pytest
 from jupyter_client import kernelspec
 from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
+from playwright.sync_api import Page
 
 from papermill_report.papermill_report import PapermillReport
+
+
+FORBIDDEN = re.compile(r"[\/\.:\s]+")
+
+
+def pytest_runtest_makereport(item, call) -> None:
+    """Take screenshot on playwright failure."""
+    if call.when == "call":
+        if call.excinfo is not None and "page" in item.funcargs:
+            page = item.funcargs["page"]
+            screenshot_dir = Path(".playwright/screenshots")
+            screenshot_dir.mkdir(exist_ok=True)
+            clean_nodeid = FORBIDDEN.sub("-", item.nodeid).lower()
+            page.screenshot(path=str(screenshot_dir / f"{clean_nodeid}.png"))
+
+
+@pytest.fixture(scope="function")
+def report_page(page):
+    # FIXME
+    # context = browser.newContext(
+    #     {
+    #         "recordVideo": {
+    #             "dir": ".playwright/videos/",
+    #             "size": {"width": 800, "height": 600},
+    #         },
+    #         "width": 800,
+    #         "height": 600,
+    #     }
+    # )
+    # page = context.newPage()
+    page.goto("http://localhost:8000/hub/login")
+
+    # Fill input[name="username"]
+    page.fill('input[name="username"]', "marc")
+
+    # Login
+    with page.expect_navigation():
+        page.click('input[type="submit"]')
+
+    page.goto("http://localhost:8000/services/report/")
+
+    # Acknowledge oauth
+    page.click('input[type="submit"]')
+
+    yield page
+
+    context.close()
 
 
 @pytest.fixture(scope="function")
@@ -71,7 +121,9 @@ def template_root_dir(tmp_path):
 @pytest.fixture
 def app(tmp_path, template_root_dir, git_project):
     service = PapermillReport(
-        template_root_dir=str(template_root_dir), template_git_url=str(git_project)
+        broken_reports_dir=str(tmp_path / "broken_reports"),
+        template_root_dir=str(template_root_dir),
+        template_git_url=str(git_project),
     )
     service.initialize()
     return service.make_app()
