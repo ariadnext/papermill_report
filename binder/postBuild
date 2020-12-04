@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# Binder postBuild instructions
+set -eux
+
+# Copy JupyterHub static to fake its integration
+cp -r /srv/conda/envs/notebook/share/jupyterhub/static/* papermill_report/static/
+
+python -m pip install .
+
+jupyter labextension install @jupyterlab/server-proxy --no-build
+jupyter lab build --minimize=False
+
+mkdir -p ${HOME}/.jupyter/
+cp binder/jupyter_config.py ${HOME}/.jupyter/
