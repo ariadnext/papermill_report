@@ -47,7 +47,7 @@ This is needed to build the link to broken notebook.
 
 ## Notes
 
-- The service must be run as `root` because report processes are executed through `su <user> --login` command to
+- On Unix platforms, the service must be run as `root` because report processes are executed through `su <user> --login` command to
 impersonate the authenticated user and setting the environment variables afresh.
 
 ## Development

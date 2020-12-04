@@ -2,7 +2,6 @@ import ast
 import json
 import logging
 import os
-import pwd
 import re
 import stat
 import sys
@@ -23,6 +22,11 @@ from tornado.log import app_log
 from .utils import _execute_command, update_git_repository
 
 ANONYMOUS_USER = "anonymous_pm_report"
+
+try:
+    import pwd
+except ImportError:  # None Unix
+    pwd = None
 
 if os.environ.get("JUPYTERHUB_API_TOKEN"):
     from jupyterhub.services.auth import HubOAuthenticated
@@ -323,7 +327,7 @@ class TemplateHandler(ReportHandler):
         Returns:
             The copied broken report path
         """
-        local_user = pwd.getpwnam(username) if username != ANONYMOUS_USER else None
+        local_user = pwd.getpwnam(username) if pwd is not None and username != ANONYMOUS_USER else None
         prefix = datetime.strftime(datetime.now(), "%Y-%m-%d") + "_broken_"
         broken_notebook = Path(self.broken_path) / (prefix + notebook_path.name)
         if not broken_notebook.parent.exists():
@@ -439,7 +443,7 @@ class TemplateHandler(ReportHandler):
                 str(output_nb),
             ]
             try:
-                if username != ANONYMOUS_USER:
+                if pwd is not None and username != ANONYMOUS_USER:
                     # Generate the report impersonating the authenticated user
                     await _execute_command(
                         ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder
@@ -466,7 +470,7 @@ class TemplateHandler(ReportHandler):
                     str(output_nb),
                 ]
 
-                if username != ANONYMOUS_USER:
+                if pwd is not None and username != ANONYMOUS_USER:
                     await _execute_command(
                         ["su", username, "-l", "-c", " ".join(command)], cwd=tmp_folder
                     )
