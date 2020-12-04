@@ -26,7 +26,7 @@ def pytest_runtest_makereport(item, call) -> None:
 
 
 @pytest.fixture(scope="function")
-def report_page(page):
+def report_page(page: Page):
     # FIXME
     # context = browser.newContext(
     #     {
@@ -55,7 +55,7 @@ def report_page(page):
 
     yield page
 
-    context.close()
+    # context.close()
 
 
 @pytest.fixture(scope="function")

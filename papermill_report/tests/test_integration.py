@@ -8,7 +8,7 @@ def test_broken_report(report_page):
 
     # Expect we get a link to open the broken notebook back in JupyterLab
     with report_page.expect_navigation(url="http://localhost:8000/user/marc/lab"):
-        report_page.click("text=/.*/home/marc/broken_reports/.*broken.*\.ipynb/")
+        report_page.click(r"text=/.*/home/marc/broken_reports/.*broken.*\.ipynb/")
 
     report_page.waitForSelector(
         "//span[normalize-space(.)=\"An Exception was encountered at 'In [2]'.\"]",
