@@ -10,6 +10,8 @@ c.JupyterHub.authenticator_class = "jupyterhub.auth.DummyAuthenticator"
 c.Authenticator.admin_users = {"jovyan"}
 c.Authenticator.allowed_users = {"jovyan", "marc"}
 
+c.JupyterHub.redirect_to_server = False
+
 c.JupyterHub.spawner_class = "jupyterhub.spawner.LocalProcessSpawner"
 
 c.LocalProcessSpawner.notebook_dir = "/home/{username}"
@@ -31,14 +33,12 @@ c.JupyterHub.services = [
             "8888",
             "--PapermillReport.template_root_dir",
             "/opt/ariadnext/reports/",
-            # Comment the two following options if you want to test the non-git case
-            "--PapermillReport.template_git_url",
-            "/tmp/papermill_report/",
-            "--PapermillReport.template_dir",
-            "examples"
-            # "--PapermillReport.template_paths",
-            # "/usr/local/share/jupyterhub/templates"
+            # Uncomment the two following options if you want to test the git case
+            # "--PapermillReport.template_git_url",
+            # "/tmp/papermill_report/",
+            # "--PapermillReport.template_dir",
+            # "examples"
         ],
-        "oauth_no_confirm": True,
+        # "oauth_no_confirm": True,
     }
 ]

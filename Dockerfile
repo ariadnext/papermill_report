@@ -17,8 +17,8 @@ COPY ./jupyterhub_config.py /srv/jupyterhub/
 
 # Install the package
 COPY . /tmp/papermill_report/
-RUN python3 -m pip install --no-deps --no-cache-dir --no-warn-script-location /tmp/papermill_report
-#  Uncomment if you want to test non-git repository case
-#  && mkdir -p /opt/ariadnext/reports/ \
-#  && cp -r /tmp/papermill_report/examples/* /opt/ariadnext/reports/ \
-#  && rm -rf /tmp/papermill_report
+RUN python3 -m pip install --no-deps --no-cache-dir --no-warn-script-location /tmp/papermill_report \
+#  Comment if you want to test git repository case
+ && mkdir -p /opt/ariadnext/reports/ \
+ && cp -r /tmp/papermill_report/examples/* /opt/ariadnext/reports/ \
+ && rm -rf /tmp/papermill_report
