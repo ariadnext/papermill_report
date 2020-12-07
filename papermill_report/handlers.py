@@ -184,7 +184,7 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
             if reason:
                 status_message = reason
 
-            traceback = tb.format_tb(exc_info[2])
+            traceback = "<br />".join(tb.format_tb(exc_info[2]))
 
         # build template namespace
         ns = dict(
