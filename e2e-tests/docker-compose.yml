@@ -20,8 +20,8 @@ services:
     depends_on:
       - hub
     volumes:
-      - $PWD:/tmp/papermill_report
-    working_dir: /tmp/papermill_report
+      - $PWD:/tmp/papermill_report_src
+    working_dir: /tmp/papermill_report_src
 
 networks:
   frontend:
