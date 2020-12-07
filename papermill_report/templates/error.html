@@ -13,6 +13,7 @@
 
   {% if traceback %}
   <p>The error was:</p>
+  {% if error_str %}<p>{{error_str}}</p>{% endif %}
   <div class="traceback-wrapper">
     <pre class="traceback">{{traceback}}</pre>
   </div>

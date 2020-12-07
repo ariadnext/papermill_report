@@ -171,6 +171,7 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
         """
         status_message = responses.get(status_code, "Unknown HTTP Error")
         exception = "(unknown)"
+        error_str = ""
         if exc_info:
             exception = exc_info[1]
             # get the custom message, if defined
@@ -179,18 +180,21 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
             except Exception:
                 pass
 
+            error_str = str(exception)
+
             # construct the custom reason, if defined
             reason = getattr(exception, "reason", "")
             if reason:
                 status_message = reason
 
-            traceback = tb.format_tb(exc_info[2])
+            traceback = "<br />".join(tb.format_tb(exc_info[2]))
 
         # build template namespace
         ns = dict(
             status_code=status_code,
             status_message=status_message,
             message=message,
+            error_str=error_str,
             traceback=traceback,
         )
 

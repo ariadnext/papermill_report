@@ -1,4 +1,5 @@
 import json
+import re
 from subprocess import check_call
 
 import pytest
@@ -6,6 +7,9 @@ from jupyter_client import kernelspec
 from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 
 from papermill_report.papermill_report import PapermillReport
+
+
+FORBIDDEN = re.compile(r"[\/\.:\s]+")
 
 
 @pytest.fixture(scope="function")
@@ -71,7 +75,9 @@ def template_root_dir(tmp_path):
 @pytest.fixture
 def app(tmp_path, template_root_dir, git_project):
     service = PapermillReport(
-        template_root_dir=str(template_root_dir), template_git_url=str(git_project)
+        broken_reports_dir=str(tmp_path / "broken_reports"),
+        template_root_dir=str(template_root_dir),
+        template_git_url=str(git_project),
     )
     service.initialize()
     return service.make_app()

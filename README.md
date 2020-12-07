@@ -72,7 +72,7 @@ as JupyterHub service.
 
 ```
 python -m install -r requirements.txt -r requirements_dev.txt
-pytest
+pytest papermill_report
 ```
 
 #### Integration with JupyterHub
@@ -93,9 +93,16 @@ There are no password on the accounts.
 
 The template folder is the `examples` folder of this project.
 
-To test the service, go to one valid endpoint:
+You can also test the service manually by visiting valid endpoints:
 
 - `http://localhost:8000/services/report/`
 - `http://localhost:8000/services/report/broken_parameters.ipynb`
 - `http://localhost:8000/services/report/no_parameters.ipynb`
 - `http://localhost:8000/services/report/subfolder/simple_execute.ipynb&msg=hello`
+
+Integration tests can be executed automatically using that environment with the following command:
+
+```
+docker-compose -f e2e-tests/docker-compose.yml run e2e ./e2e-tests/run_e2e.sh
+docker-compose -f e2e-tests/docker-compose.yml down
+```
