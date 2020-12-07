@@ -171,6 +171,7 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
         """
         status_message = responses.get(status_code, "Unknown HTTP Error")
         exception = "(unknown)"
+        error_str = ""
         if exc_info:
             exception = exc_info[1]
             # get the custom message, if defined
@@ -178,6 +179,8 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
                 message = exception.log_message % exception.args
             except Exception:
                 pass
+
+            error_str = str(exception)
 
             # construct the custom reason, if defined
             reason = getattr(exception, "reason", "")
@@ -191,6 +194,7 @@ class ReportHandler(HubOAuthenticated, web.RequestHandler):
             status_code=status_code,
             status_message=status_message,
             message=message,
+            error_str=error_str,
             traceback=traceback,
         )
 
