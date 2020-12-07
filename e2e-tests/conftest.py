@@ -24,8 +24,6 @@ def pytest_runtest_makereport(item, call) -> None:
                         take_screenshot(
                             page, "-".join((slugify(item.nodeid), str(cidx), str(idx)))
                         )
-            if "report_page" in item.funcargs:
-                take_screenshot(item.funcargs["report_page"], slugify(item.nodeid))
 
 
 @pytest.fixture(scope="session")
