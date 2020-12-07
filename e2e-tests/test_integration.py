@@ -43,3 +43,15 @@ def test_simple_execute(report_page, slow_motion):
     report_page.waitForSelector("text=/.*WelcomeWelcomeWelcome.*/")
 
     slow_motion()
+
+
+@pytest.mark.e2e
+def test_direct_access_to_report(login, base_url, slow_motion):
+    login.goto(base_url + "/services/report/subfolder/simple_execute.ipynb?n=4&msg=cherry%20")
+
+    # Acknowledge oauth
+    login.click('input[type="submit"]')
+
+    login.waitForSelector("text=/.*cherry cherry cherry cherry.*/")
+
+    slow_motion()

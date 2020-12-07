@@ -17,12 +17,15 @@ def take_screenshot(page, uid):
 
 def pytest_runtest_makereport(item, call) -> None:
     if call.when == "call":
-        if call.excinfo is not None and "browser" in item.funcargs:
-            for cidx, context in enumerate(item.funcargs["browser"].contexts):
-                for idx, page in enumerate(context.pages):
-                    take_screenshot(
-                        page, "-".join((slugify(item.nodeid), str(cidx), str(idx)))
-                    )
+        if call.excinfo is not None:
+            if "browser" in item.funcargs:
+                for cidx, context in enumerate(item.funcargs["browser"].contexts):
+                    for idx, page in enumerate(context.pages):
+                        take_screenshot(
+                            page, "-".join((slugify(item.nodeid), str(cidx), str(idx)))
+                        )
+            if "report_page" in item.funcargs:
+                take_screenshot(item.funcargs["report_page"], slugify(item.nodeid))
 
 
 @pytest.fixture(scope="session")
@@ -52,7 +55,7 @@ def browser_context_args(browser_context_args):
 
 
 @pytest.fixture(scope="function")
-def report_page(page: Page, base_url: str):
+def login(page: Page, base_url:str):
     page.goto(base_url + "/hub/login")
 
     # Fill input[name="username"]
@@ -62,9 +65,14 @@ def report_page(page: Page, base_url: str):
     with page.expect_navigation():
         page.click('input[type="submit"]')
 
-    page.goto(base_url + "/services/report/")
+    yield page
+
+
+@pytest.fixture(scope="function")
+def report_page(login: Page, base_url: str):
+    login.goto(base_url + "/services/report/")
 
     # Acknowledge oauth
-    page.click('input[type="submit"]')
+    login.click('input[type="submit"]')
 
-    yield page
+    yield login
