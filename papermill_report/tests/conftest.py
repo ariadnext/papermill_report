@@ -1,6 +1,5 @@
 import json
 import re
-from pathlib import Path
 from subprocess import check_call
 
 import pytest

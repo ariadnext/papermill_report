@@ -6,7 +6,7 @@ from slugify import slugify
 from playwright.sync_api import Page
 
 
-SLOW_MOTION_TIME = 2000 # Time to wait between action in milliseconds
+SLOW_MOTION_TIME = 2000  # Time to wait between action in milliseconds
 
 
 def take_screenshot(page, uid):
@@ -31,6 +31,7 @@ def slow_motion():
 
     By default 0.001 * SLOW_MOTION_TIME
     """
+
     def pause(delay=SLOW_MOTION_TIME * 0.001):
         sleep(delay)
 
@@ -39,11 +40,7 @@ def slow_motion():
 
 @pytest.fixture(scope="session")
 def browser_type_launch_args(browser_type_launch_args):
-    return {
-        **browser_type_launch_args,
-        "slowMo": SLOW_MOTION_TIME,
-        "timeout": 5000,
-    }
+    return {**browser_type_launch_args, "slowMo": SLOW_MOTION_TIME, "timeout": 5000}
 
 
 @pytest.fixture(scope="session")
