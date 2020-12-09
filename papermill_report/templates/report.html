@@ -97,7 +97,8 @@
     for (const parameter of parameters) {
       schema.properties[parameter.name] = {
         type: python2JSType(parameter.inferred_type_name),
-        default: parameter.default
+        default: parameter.default,
+        description: parameter.help
       }
     }
 
