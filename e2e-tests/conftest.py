@@ -25,9 +25,9 @@ def pytest_sessionstart(session):
 
 
 def take_screenshot(page, uid):
-    screenshot_dir = Path(".playwright") / "screenshots"
-    screenshot_dir.mkdir(exist_ok=True)
-    page.screenshot(path=str(screenshot_dir / f"{uid}.png"))
+    screenshot_img = SCREENSHOTS_DIR / f"{uid}.png"
+    screenshot_img.parent.mkdir(parents=True, exist_ok=True)
+    page.screenshot(path=str(screenshot_img))
 
 
 def pytest_runtest_makereport(item, call) -> None:
