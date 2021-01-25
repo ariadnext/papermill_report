@@ -41,10 +41,16 @@ jobs:
         git config --global user.name "GitHub CI"
         python -m pytest papermill_report
     - name: Integration tests
-      run: docker-compose -f "./e2e-tests/docker-compose.yml" run e2e ./e2e-tests/run_e2e.sh
+      run: |
+        docker-compose -f "./e2e-tests/docker-compose.yml" down || true
+        docker-compose -f "./e2e-tests/docker-compose.yml" pull
+        docker-compose -f "./e2e-tests/docker-compose.yml" run --rm e2e ./e2e-tests/run_e2e.sh
     - name: Stop containers
       if: always()
-      run: docker-compose -f "./e2e-tests/docker-compose.yml" down
+      run: |
+        # Print hub logs before removing the containers using the container name set in docker-compose file
+        docker logs jp-hub
+        docker-compose -f "./e2e-tests/docker-compose.yml" down
     - name: Upload screenshots and videos
       if: always()
       uses: actions/upload-artifact@v2

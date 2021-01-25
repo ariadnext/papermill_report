@@ -2,6 +2,7 @@ version: "3.5"
 
 services:
   hub:
+    container_name: jp-hub
     build:
       context: ..
       dockerfile: ./Dockerfile

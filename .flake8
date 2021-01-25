@@ -1,6 +1,6 @@
 [flake8]
 exclude = jupyterhub_config.py
 max-line-length = 100
-ignore = C408, C812, C813, E203, E501, E741, I100, I202, I201, I900, W503
+ignore = B902, C408, C812, C813, E203, E501, E741, I100, I202, I201, I900, W503
 select = C, E, F, W, B, B950
 docstring-convention = numpy
