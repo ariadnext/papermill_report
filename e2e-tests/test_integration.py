@@ -14,7 +14,7 @@ def test_broken_report(report_page, base_url, slow_motion):
     with report_page.expect_navigation(url=base_url + "/user/marc/lab"):
         report_page.click(r"text=/.*/home/marc/broken_reports/.*broken.*\.ipynb/")
 
-    report_page.waitForSelector(
+    report_page.wait_for_selector(
         "//span[normalize-space(.)=\"An Exception was encountered at 'In [2]'.\"]"
     )
 
