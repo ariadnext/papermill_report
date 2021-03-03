@@ -3,6 +3,10 @@ import pytest
 
 @pytest.mark.e2e
 def test_broken_report(report_page, base_url, slow_motion):
+    report_page.select_option(
+        'select[id="report-selector"]', "broken_parameters.ipynb"
+    )
+
     # Click input[type="submit"]
     report_page.click('input[type="submit"]')
 
