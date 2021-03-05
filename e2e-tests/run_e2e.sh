@@ -1,11 +1,7 @@
 #!/bin/bash
 set -e
 
-apt-get update
-apt install -y python3-distutils
-python3 ./e2e-tests/get-pip.py
 python3 -m pip install -r ./requirements_e2e.txt
-python3 -m playwright install
 # Ensure files written by playwright on the volume are writable by everybody
 umask a+w
 # End to end tests are stored in a separate folder

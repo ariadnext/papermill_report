@@ -65,22 +65,22 @@ def slow_motion():
     By default 0.001 * SLOW_MOTION_TIME
     """
 
-    def pause(delay=SLOW_MOTION_TIME * 0.001):
-        sleep(delay)
+    def pause(delay=SLOW_MOTION_TIME * 0.001, min_delay=0):
+        sleep(max(0, min_delay - delay if min_delay > 0 else delay))
 
     return pause
 
 
 @pytest.fixture(scope="session")
 def browser_type_launch_args(browser_type_launch_args):
-    return {**browser_type_launch_args, "slowMo": SLOW_MOTION_TIME, "timeout": DEFAULT_TIMEOUT}
+    return {**browser_type_launch_args, "slow_mo": SLOW_MOTION_TIME, "timeout": DEFAULT_TIMEOUT}
 
 
 @pytest.fixture(scope="session")
 def browser_context_args(browser_context_args):
     return {
         **browser_context_args,
-        "recordVideo": {"dir": str(VIDEOS_DIR)},
+        "record_video_dir": str(VIDEOS_DIR),
     }
 
 
